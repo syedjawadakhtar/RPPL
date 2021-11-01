@@ -7,7 +7,6 @@
 import pygame, time
 from pygame.locals import *
 from rppl_util import *
-from polygon_triangulate import polygon_area
 
 Open = True
 pstat = 0
