@@ -12,7 +12,7 @@ This library was developed on Windows 10 using Python 3.9.5, and was also tested
 
 Main files:
 
-- valit_simple.py:  Input a weighted graph and the code computes the optimal, stationary cost-to-go function for a goal region usinng value iteration.
+- valit_simple.py:  Input a weighted graph and the code computes the optimal, stationary cost-to-go function for a goal region using value iteration.
 
 - valit_grids.py:  Runs a GUI that selects one of several predefined 2D planning problems involving disc obstacles. A 2D grid is constructed based on various neighborhood options. Value iteration is used to compute optimal, stationary cost-to-go function over the grid and an optimal path is computed and shown. An option to instead use Dijkstra's algorithm is also available. Using the GUI, the values can be saved and then read using valit_plot_values.py so that they can be easily visualized as a 3D surface.
 
