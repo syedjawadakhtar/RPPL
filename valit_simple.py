@@ -27,19 +27,16 @@ def valit(graph, goal):
         max_change = 0.0
         for m in graph.nodes:
             best_cost = failure_cost
-            best_n = m
             for n in graph.neighbors(m):
                 step_cost = graph.get_edge_data(m,n)['weight']
                 cost = graph.nodes[n]['value'] + step_cost
                 if cost < best_cost:
                     best_cost = cost
-                    best_n = n
             stay_cost = graph.nodes[m]['value']
             if best_cost < stay_cost:
                 if stay_cost - best_cost > max_change:
                     max_change = stay_cost - best_cost
                 set_node_attributes(graph, {m:best_cost}, 'value')
-                set_node_attributes(graph, {m:best_n}, 'next')
         i += 1
         print('Iteration: ' +str(i), ' ', get_node_attributes(G, 'value'))
     
