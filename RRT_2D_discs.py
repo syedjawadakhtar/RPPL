@@ -18,7 +18,7 @@ stepsize = 5
 numobst = 20   #number of obstacles
 
 i = 0
-open = True
+Open = True
 pstat = 0
 stepping = True
 restart = True
@@ -44,22 +44,21 @@ def find_closest_node(mpos,nodes):
 
 print('\n*CONTROLS*\nR = Re-Run\nESC = Stop all\n')
 
-while open:
-    if restart:
-        G = nx.Graph()
-        G.add_node(0, point=(xmax/2,ymax/2))
-        pygame.init()
-        screen = pygame.display.set_mode([xmax,ymax])
-        screen.fill(black)
-        pygame.draw.circle(screen,white,G.nodes[0]['point'],5)
-        obstacles = create_random_discs(numobst,G.nodes[0]['point'])
-        draw_discs(obstacles,screen)
-        goal = pick_random_goal(obstacles)
-        pygame.draw.circle(screen,red,goal,8)
-        pygame.display.update()
-        restart = False
-        i = 0
-        j = cycle
+while Open:
+    G = nx.Graph()
+    G.add_node(0, point=(xmax/2,ymax/2))
+    pygame.init()
+    screen = pygame.display.set_mode([xmax,ymax])
+    screen.fill(black)
+    pygame.draw.circle(screen,white,G.nodes[0]['point'],5)
+    obstacles = create_random_discs(numobst,G.nodes[0]['point'])
+    draw_discs(obstacles,screen)
+    goal = pick_random_goal(obstacles)
+    pygame.draw.circle(screen,red,goal,8)
+    pygame.display.update()
+    restart = False
+    i = 0
+    j = cycle
 
     while dist2(G.nodes[len(G.nodes)-1]['point'],goal) > stepsize:
         i += 1

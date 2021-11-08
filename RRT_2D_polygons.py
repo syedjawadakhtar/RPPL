@@ -80,22 +80,21 @@ for o in range(len(obstacles)):
 print('\n*CONTROLS*\nR = Re-Run\nSPACEBAR = Alternate RRT type\nESC = Stop all\n')
 
 while Open:
-    if restart == True:
-        I = nx.Graph()
-        G = nx.Graph()
-        I.add_node(0, point=initial)
-        G.add_node(0, point=goal)
-        pygame.init()
-        screen = pygame.display.set_mode([xmax,ymax])
-        pygame.display.set_caption('RRT Plan')
-        screen.fill(black)
-        pygame.draw.circle(screen,green,initial,5)
-        pygame.draw.circle(screen,red,goal,5)
-        draw_polys(tlist,screen)
-        pygame.display.update()
-        pstat = 0
-        restart = False
-        i = 0
+    I = nx.Graph()
+    G = nx.Graph()
+    I.add_node(0, point=initial)
+    G.add_node(0, point=goal)
+    pygame.init()
+    screen = pygame.display.set_mode([xmax,ymax])
+    pygame.display.set_caption('RRT Plan')
+    screen.fill(black)
+    pygame.draw.circle(screen,green,initial,5)
+    pygame.draw.circle(screen,red,goal,5)
+    draw_polys(tlist,screen)
+    pygame.display.update()
+    pstat = 0
+    restart = False
+    i = 0
 
     if bidirectional:
         while dist2(I.nodes[len(I.nodes)-1]['point'],G.nodes[len(G.nodes)-1]['point']) > stepsize:

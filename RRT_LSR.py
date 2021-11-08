@@ -14,8 +14,8 @@ from rppl_globals import *
 
 
 show_rrt_progress = True
-bidirectional = False
-length = 60
+bidirectional = True
+length = 10
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
@@ -60,8 +60,6 @@ def add_next_node(q,closest,t):
             newconfig.append(fix_angle(c[i] + (q[i] - c[i]) * diff))
         else:
             newconfig.append(fix_angle(c[i] - (q[i] - c[i]) * diff))
-        if i == 40:
-            print(d,diff)
     return newconfig
 
 def find_closest_node(rc,nodes):
@@ -96,24 +94,23 @@ def step_to_config(t,q):
             stepping = False
 
 while Open:
-    if restart:
-        I = nx.Graph()
-        G = nx.Graph()
-        I.add_node(0, config=config)
-        G.add_node(0, config=goal)
-        pygame.init()
-        screen = pygame.display.set_mode([xmax,ymax])
-        screen.fill(black)
-        obstacles = create_random_discs(numobst,base)
-        draw_discs(obstacles,screen)
-        draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
-        pygame.display.update()
-        time.sleep(0.5)
-        pstat = 0
-        restart = False
-        pygame.display.set_caption('RRT Line Segment Robot')
-        t = time.time()
-        i = 0
+    I = nx.Graph()
+    G = nx.Graph()
+    I.add_node(0, config=config)
+    G.add_node(0, config=goal)
+    pygame.init()
+    screen = pygame.display.set_mode([xmax,ymax])
+    screen.fill(black)
+    obstacles = create_random_discs(numobst,base)
+    draw_discs(obstacles,screen)
+    draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
+    pygame.display.update()
+    time.sleep(0.5)
+    pstat = 0
+    restart = False
+    pygame.display.set_caption('RRT Line Segment Robot')
+    t = time.time()
+    i = 0
         
     if bidirectional:
         while config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
@@ -137,7 +134,7 @@ while Open:
     print('time elapsed: ' + str(time.time() - t) + ' seconds')
     path = shortest_path(I, source=0, target=len(I.nodes)-1)
     for s in path:
-        time.sleep(0.01)
+        time.sleep(0.001)
         screen.fill(black)
         draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, I.nodes[s]['config']),screen,white)
@@ -145,7 +142,7 @@ while Open:
 
     path = shortest_path(G, source=len(G.nodes)-1, target=0)
     for s in path:
-        time.sleep(0.01)
+        time.sleep(0.001)
         screen.fill(black)
         draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, G.nodes[s]['config']),screen,white)
