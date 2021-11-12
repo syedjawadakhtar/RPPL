@@ -8,11 +8,10 @@ from networkx.classes.function import get_node_attributes, set_node_attributes
 import pygame, time
 from pygame.locals import *
 import networkx as nx
-from math import sqrt
-from valit_examples import *
 from tkinter import *
 from rppl_globals import *
 from rppl_util import *
+from ast import literal_eval
 
 dims = 20 # number of samples per axis
 radius = 1 # neightborhood radius (1 = four-neighbors)
@@ -21,6 +20,7 @@ xmax = 800 # force a square environment
 
 screen = pygame.display.set_mode([xmax,ymax])
 use_dijkstra = False
+pygame.display.set_caption('Grid Planner')
 
 # value iteration constants
 failure_cost = 1.0E30
@@ -86,21 +86,23 @@ def valit_path(graph, init, goal):
                 goal_reached = True
     return path
 
-# This corresponds to a GUI button that runs the example.
-def Draw(): 
+# This corresponds to GUI button 'Draw' that runs the example.
+def Draw():
+    obstacles = literal_eval(problines[exnum*3])
+    initial = literal_eval(problines[exnum*3+1])
+    goal = literal_eval(problines[exnum*3+2])
+
     global G
     arr = [[0 for i in range(dims)] for j in range(dims)]
     actions = generate_neighborhood_indices(radius)
     G = nx.Graph()
     pygame.init()
     screen.fill(black)
-    obstacles = examples[exnum][0]
     incrementy = 0
     i = 0
-    initial = [examples[exnum][1],examples[exnum][2]]
-    goal = [examples[exnum][3],examples[exnum][4]]
     length = 0
-
+    
+    # construct grid
     for y in range(dims):
         if y > 0:
             incrementy += ymax/dims + (ymax/dims)/(dims-1)
@@ -131,20 +133,40 @@ def Draw():
     p2index = find_closest_node(goal,G.nodes)
     if nx.has_path(G,p1index,p2index):
         if use_dijkstra:
+            t = time.time()
             path = nx.dijkstra_path(G,p1index,p2index)
+            print('dijkstra:    time elapsed:     ' + str(time.time() - t) + ' seconds')
         else:
+            t = time.time()
             path = valit_path(G,p1index,p2index)
+            print('value iteration: time elapsed: ' + str(time.time() - t) + ' seconds')
         for l in range(len(path)):
             if l > 0:
                 pygame.draw.line(screen,green,G.nodes[path[l]]['point'],G.nodes[path[l-1]]['point'],5)
                 length += G.get_edge_data(path[l],path[l-1])['weight']
+        pygame.display.set_caption('Grid Planner, Euclidean Distance: ' +str(length))
+    else:
+        print('Path not found')
+        pygame.display.set_caption('Grid Planner')
     pygame.draw.circle(screen,green,initial,10)
     pygame.draw.circle(screen,red,goal,10)
-    pygame.display.set_caption('Value Iteration, Euclidean Distance: ' +str(length))
     pygame.display.update()
 
-
+# get example list
+problem = open('problem_circles.txt')
+problines = problem.readlines()
+problem.close()
+num_of_ex = len(problines)/3
 # The rest is for the GUI.
+
+def SwitchType():
+    global use_dijkstra
+    if use_dijkstra:
+        use_dijkstra = False
+        Draw()
+    else:
+        use_dijkstra = True
+        Draw()
 
 def SetDims(val):
     global dims
@@ -167,8 +189,8 @@ def SaveData():
     data.close()
 
 master = Tk()
-master.title('Value Iteration GUI')
-master.geometry("550x80")
+master.title('Grid-Planner GUI')
+master.geometry("630x80")
 
 m1 = PanedWindow(master,borderwidth=10,bg="#000000")
 m1.pack(fill = BOTH,expand = 1)
@@ -178,6 +200,9 @@ m1.add(exitbutton)
 
 savebutton = Button(m1, text='     Save     ',command=SaveData,fg='blue')
 m1.add(savebutton)
+
+switchbutton = Button(m1, text='   Change   \n   Planner   ',command=SwitchType,fg='brown')
+m1.add(switchbutton)
 
 drawbutton = Button(m1, text='     Draw     ',command=Draw,fg='green')
 m1.add(drawbutton)
@@ -190,7 +215,7 @@ radscale = Scale(m1, orient = HORIZONTAL, from_=1, to=10, resolution=0.1, comman
 radscale.set(radius)
 m1.add(radscale)
 
-exscale = Scale(m1, orient = HORIZONTAL, from_=1, to=len(examples), resolution=1, command=SetExNum, label='Example Number')
+exscale = Scale(m1, orient = HORIZONTAL, from_=1, to=num_of_ex, resolution=1, command=SetExNum, label='Example Number')
 exscale.set(int(exnum))
 m1.add(exscale)
 
