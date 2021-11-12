@@ -14,10 +14,10 @@ Main files:
 
 - valit_simple.py:  Input a weighted graph and the code computes the optimal, stationary cost-to-go function for a goal region using value iteration.
 
-- valit_grids.py:  Runs a GUI that selects one of several predefined 2D planning problems involving disc obstacles. A 2D grid is constructed based on various neighborhood options. Value iteration is used to compute optimal, stationary cost-to-go function over the grid and an optimal path is computed and shown. An option to instead use Dijkstra's algorithm is also available. Using the GUI, the values can be saved and then read using valit_plot_values.py so that they can be easily visualized as a 3D surface.
+- valit_grids.py:  Runs a GUI that selects one of several 2D planning problems which can be created with draw_circles.py. A 2D grid is constructed based on various neighborhood options. Value iteration is used to compute optimal, stationary cost-to-go function over the grid and an optimal path is computed and shown. An option to instead use Dijkstra's algorithm is also available. Using the GUI, the values can be saved and then read using valit_plot_values.py so that they can be easily visualized as a 3D surface.
 
-- RRT_2D_discs.py:  Generates and solves 2D planning problems by generating random disc obstacles and solving the planning problem using a goal-biased rapidly exploring random tree (RRT)
+- RRT_2D_discs.py:  Generates and solves 2D planning problems by generating random disc obstacles and solving the planning problem using a goal-biased rapidly exploring random tree (RRT).
 
-- RRT_2D_polygons.py:  Similar to RRT_2D_discs.py, but instead works for obstacles that are simple polygons. To create an example problem, use draw_problem_2D.py.
+- RRT_2D_polygons.py:  Similar to RRT_2D_discs.py, but instead works for obstacles that are simple polygons. To create an example problem, use draw_polygons.py.
 
 - RRT_LSR.py:  Solves planning problems using goal bias or bidirectional RRT for a 2D kinematic chain of line segments with a fixed base and arbitrarily many links. The base is fixed.
