@@ -95,6 +95,8 @@ while Open:
     pstat = 0
     restart = False
     i = 0
+    t = time.time()
+    step_to_config(I,goal) # Check for straight line
 
     if bidirectional:
         while dist2(I.nodes[len(I.nodes)-1]['point'],G.nodes[len(G.nodes)-1]['point']) > stepsize:
@@ -116,6 +118,7 @@ while Open:
             i += 1
 
     pygame.display.set_caption('RRT Plan, Total nodes: ' + str(len(I.nodes)+len(G.nodes)))
+    print('planning time: ' + str(time.time() - t) + ' seconds')
 
     while restart == False:
         time.sleep(0.02)

@@ -16,18 +16,16 @@ from rppl_globals import *
 show_rrt_progress = True
 bidirectional = True
 length = 10
+numobst = 1  #number of obstacles
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
 config = [-2*pi/length for i in range(length)]
 stepsize = 0.01
-numobst = 0  #number of obstacles
 goal = [2*pi/length for i in range(length)]
 bias = 2
 
 Open = True
-stepping = True
-restart = True
 
 
 def transform_robot(l, b, q):
@@ -80,6 +78,7 @@ def step_to_config(t,q):
         if show_rrt_progress:
             screen.fill(black)
             draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
+            draw_discs(obstacles,screen)
             if bidirectional:
                 draw_arm(transform_robot(links, base, G.nodes[len(G.nodes)-1]['config']),screen,red)
             pygame.display.update()
@@ -101,9 +100,13 @@ while Open:
     pygame.init()
     screen = pygame.display.set_mode([xmax,ymax])
     screen.fill(black)
-    obstacles = create_random_discs(numobst,base)
+    unobstructed = False
+    while not unobstructed:
+        obstacles = create_random_discs(numobst,base)
+        if safe_segments(transform_robot(links, base, config),obstacles) and safe_segments(transform_robot(links, base, goal),obstacles):
+            unobstructed = True
     draw_discs(obstacles,screen)
-    draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
+    draw_arm(transform_robot(links, base, config),screen,white)
     pygame.display.update()
     time.sleep(0.5)
     pstat = 0
@@ -111,8 +114,9 @@ while Open:
     pygame.display.set_caption('RRT Line Segment Robot')
     t = time.time()
     i = 0
-        
+
     if bidirectional:
+        step_to_config(I,goal) # Check for straight line
         while config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
             rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
             step_to_config(I,rc)
@@ -130,11 +134,17 @@ while Open:
                 rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
             step_to_config(I,rc)
             i += 1
-
-    print('time elapsed: ' + str(time.time() - t) + ' seconds')
+    
+    print('planning time: ' + str(time.time() - t) + ' seconds')
+    if show_rrt_progress:
+        screen.fill(black)
+        draw_discs(obstacles,screen)
+        draw_arm(transform_robot(links, base, config),screen,white)
+        pygame.display.update()
+        time.sleep(0.6)
     path = shortest_path(I, source=0, target=len(I.nodes)-1)
     for s in path:
-        time.sleep(0.001)
+        time.sleep(0.002)
         screen.fill(black)
         draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, I.nodes[s]['config']),screen,white)
@@ -142,7 +152,7 @@ while Open:
 
     path = shortest_path(G, source=len(G.nodes)-1, target=0)
     for s in path:
-        time.sleep(0.001)
+        time.sleep(0.002)
         screen.fill(black)
         draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, G.nodes[s]['config']),screen,white)
