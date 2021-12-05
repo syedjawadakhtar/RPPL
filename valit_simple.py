@@ -38,9 +38,10 @@ def valit(graph, goal):
                     max_change = stay_cost - best_cost
                 set_node_attributes(graph, {m:best_cost}, 'value')
         i += 1
-        print('Iteration: ' +str(i), ' ', get_node_attributes(G, 'value'))
-    
+        print('Iteration: ' +str(i), ' ', get_node_attributes(graph, 'value'))
+
 # First, create the graph.
+# This graph is from Figure 2.8 from Planning Algorithms, 2006 (http://lavalle.pl/planning/).
 G = nx.DiGraph()
 G.add_nodes_from([0, 1, 2, 3, 4])
 G.add_edge(0, 0, weight=2)
@@ -52,5 +53,17 @@ G.add_edge(2, 3, weight=1)
 G.add_edge(3, 2, weight=1)
 G.add_edge(3, 4, weight=1)
 
+#This example is a linear bidirectional graph of length g2_length.
+g2_length = 20
+G2 = nx.DiGraph()
+G.add_nodes_from([i for i in range(g2_length)])
+
+for i in range(g2_length-1):
+    G2.add_edge(i, i+1, weight=1)
+for i in range(1, g2_length):
+    G2.add_edge(i, i-1, weight=1)
+
+
 # Compute the optimal cost to go.
-valit(G, 3)
+#valit(G, 3)
+valit(G2, g2_length-1)
