@@ -16,12 +16,12 @@ from rppl_globals import *
 show_rrt_progress = True
 bidirectional = True
 length = 10
-numobst = 1  #number of obstacles
+numobst = 0  #number of obstacles
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
-config = [-2*pi/length for i in range(length)]
-stepsize = 0.01
+config = [2*pi-2*pi/length for i in range(length)]
+stepsize = 0.1 / length #radians per link
 goal = [2*pi/length for i in range(length)]
 bias = 2
 
@@ -76,6 +76,7 @@ def step_to_config(t,q):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 quit()
         if show_rrt_progress:
+            #print(t.nodes[len(t.nodes)-1]['config'][1])
             screen.fill(black)
             draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
             draw_discs(obstacles,screen)
@@ -116,14 +117,19 @@ while Open:
     i = 0
 
     if bidirectional:
+        print('check for straight line')
         step_to_config(I,goal) # Check for straight line
         while config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
             rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
+            print('connect initial tree to random point')
             step_to_config(I,rc)
+            print('connect goal tree to new initial tree vertex')
             step_to_config(G,I.nodes[len(I.nodes)-1]['config'])
             if config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
                 rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
+                print('connect goal tree to random point')
                 step_to_config(G,rc)
+                print('connect initial tree to new goal vertex')
                 step_to_config(I,G.nodes[len(G.nodes)-1]['config'])
 
     else:
@@ -135,36 +141,47 @@ while Open:
             step_to_config(I,rc)
             i += 1
     
-    print('planning time: ' + str(time.time() - t) + ' seconds')
+    print('solved! planning time: ' + str(time.time() - t) + ' seconds')
     if show_rrt_progress:
         screen.fill(black)
         draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, config),screen,white)
         pygame.display.update()
         time.sleep(0.6)
-    path = shortest_path(I, source=0, target=len(I.nodes)-1)
-    for s in path:
-        time.sleep(0.002)
-        screen.fill(black)
-        draw_discs(obstacles,screen)
-        draw_arm(transform_robot(links, base, I.nodes[s]['config']),screen,white)
-        pygame.display.update()
-
-    path = shortest_path(G, source=len(G.nodes)-1, target=0)
-    for s in path:
-        time.sleep(0.002)
-        screen.fill(black)
-        draw_discs(obstacles,screen)
-        draw_arm(transform_robot(links, base, G.nodes[s]['config']),screen,white)
-        pygame.display.update()
-
+    
     while not restart:
-        time.sleep(0.05)
+        screen.fill(black)
+        draw_arm(transform_robot(links, base, config),screen,white)
         pygame.display.update()
-        mpos = pygame.mouse.get_pos()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                Open = False
-                restart = True
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                restart = True
+        time.sleep(1)
+        path = shortest_path(I, source=0, target=len(I.nodes)-1)
+        for s in path:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    restart = True
+                    break
+            if restart:
+                break
+            time.sleep(0.002)
+            screen.fill(black)
+            draw_discs(obstacles,screen)
+            draw_arm(transform_robot(links, base, I.nodes[s]['config']),screen,white)
+            pygame.display.update()
+        path = shortest_path(G, source=len(G.nodes)-1, target=0)
+        for s in path:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    restart = True
+                    break
+            if restart:
+                break
+            time.sleep(0.002)
+            screen.fill(black)
+            draw_discs(obstacles,screen)
+            draw_arm(transform_robot(links, base, G.nodes[s]['config']),screen,white)
+            pygame.display.update()
+        time.sleep(1)
