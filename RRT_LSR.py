@@ -16,7 +16,7 @@ from rppl_globals import *
 show_rrt_progress = True
 bidirectional = True
 length = 10
-numobst = 0  #number of obstacles
+numobst = 1  #number of obstacles
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
@@ -151,6 +151,7 @@ while Open:
     
     while not restart:
         screen.fill(black)
+        draw_discs(obstacles,screen)
         draw_arm(transform_robot(links, base, config),screen,white)
         pygame.display.update()
         time.sleep(1)
