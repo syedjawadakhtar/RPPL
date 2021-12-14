@@ -24,6 +24,7 @@ def valit(graph, goal):
     i = 0
     max_change = failure_cost
     while i < max_valits and max_change > 0.0:
+        update_list = []
         max_change = 0.0
         for m in graph.nodes:
             best_cost = failure_cost
@@ -36,7 +37,9 @@ def valit(graph, goal):
             if best_cost < stay_cost:
                 if stay_cost - best_cost > max_change:
                     max_change = stay_cost - best_cost
-                set_node_attributes(graph, {m:best_cost}, 'value')
+                update_list.append([m,best_cost])
+        for u in update_list:
+            set_node_attributes(graph, {u[0]:u[1]}, 'value')
         i += 1
         print('Iteration: ' +str(i), ' ', get_node_attributes(graph, 'value'))
 
