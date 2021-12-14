@@ -10,6 +10,7 @@ import networkx as nx
 from math import sqrt
 from rppl_util import *
 from rppl_globals import *
+from networkx.algorithms.shortest_paths.generic import shortest_path
 
 #global iterations, stepsize
 
@@ -28,7 +29,7 @@ cycle = 6
 def add_next_node(rp,closest,g):
     d = dist2(rp,g.nodes[closest]['point'])
     if d == 0:
-        d = 0.00000000001
+        d = 1.0E20
     diff = stepsize / d
     newpoint = ((rp[0] - g.nodes[closest]['point'][0]) * diff + g.nodes[closest]['point'][0],(rp[1] - g.nodes[closest]['point'][1]) * diff + g.nodes[closest]['point'][1])
     return newpoint
@@ -88,7 +89,11 @@ while Open:
                 restart = True
                 G.add_node(len(G.nodes),point=goal)
         pygame.display.update()
-
+        
+    if not restart:
+        path = shortest_path(G, source=0, target=len(G.nodes)-1)
+        for p in range(len(path)-1):
+            pygame.draw.line(screen,green,G.nodes[path[p]]['point'],G.nodes[path[p+1]]['point'],3)
     while not restart:
         time.sleep(0.01)
         pygame.display.update()
