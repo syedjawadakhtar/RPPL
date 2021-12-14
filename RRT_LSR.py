@@ -16,7 +16,7 @@ from rppl_globals import *
 show_rrt_progress = True
 bidirectional = True
 length = 10
-numobst = 1  #number of obstacles
+numobst = 4  #number of obstacles
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
@@ -76,7 +76,6 @@ def step_to_config(t,q):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 quit()
         if show_rrt_progress:
-            #print(t.nodes[len(t.nodes)-1]['config'][1])
             screen.fill(black)
             draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
             draw_discs(obstacles,screen)
