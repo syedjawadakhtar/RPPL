@@ -18,7 +18,7 @@ def valit(graph, goal):
     for n in graph.nodes:
         set_node_attributes(graph, {n:failure_cost}, 'value')
     set_node_attributes(graph, {goal:0.0}, 'value')
-    print('Iteration: 0  ', get_node_attributes(G, 'value'))
+    print('Iteration: 0  ', get_node_attributes(graph, 'value'))
     
     # main loop
     i = 0
@@ -56,7 +56,7 @@ G.add_edge(3, 4, weight=1)
 #This example is a linear bidirectional graph of length g2_length.
 g2_length = 20
 G2 = nx.DiGraph()
-G.add_nodes_from([i for i in range(g2_length)])
+G2.add_nodes_from([i for i in range(g2_length)])
 
 for i in range(g2_length-1):
     G2.add_edge(i, i+1, weight=1)
