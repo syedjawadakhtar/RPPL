@@ -12,12 +12,11 @@ from rppl_util import *
 from rppl_globals import *
 from polygon_triangulate import polygon_triangulate
 
-numobst = 20    #number of obstacles
+
 num_nodes = 200 #number of nodes
 radius = 180    #maximum edge length
 
 Open = True
-pstat = 0
 restart = True
 
 
@@ -48,7 +47,6 @@ while Open:
     screen.fill(black)
     pygame.display.update()
     restart = False
-    nodesdone = False
     G.add_node(0, point=(initial))
     G.add_node(1, point=(goal))
 
