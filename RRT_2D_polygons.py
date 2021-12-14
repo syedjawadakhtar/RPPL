@@ -4,6 +4,7 @@
 # Copyright (c) 2021 Alexander J. LaValle. All rights reserved.
 # This software is distributed under the simplified BSD license.
 
+from networkx.algorithms.shortest_paths.generic import shortest_path
 import pygame, time, random
 from pygame.locals import *
 import networkx as nx
@@ -107,7 +108,7 @@ while Open:
                 rc = [random.randint(0,xmax),random.randint(0,ymax)]
                 step_to_config(G,rc)
                 step_to_config(I,G.nodes[len(G.nodes)-1]['point'])
-            
+        
     else:
         while dist2(I.nodes[len(I.nodes)-1]['point'], goal) > stepsize:
             if i % bias == 0:
@@ -117,8 +118,19 @@ while Open:
             step_to_config(I,rc)
             i += 1
 
-    pygame.display.set_caption('RRT Plan, Total nodes: ' + str(len(I.nodes)+len(G.nodes)))
     print('planning time: ' + str(time.time() - t) + ' seconds')
+    pygame.display.set_caption('RRT Plan, Total nodes: ' + str(len(I.nodes)+len(G.nodes)))
+    if bidirectional:
+        path = shortest_path(I, source=0, target=len(I.nodes)-1)
+        for p in range(len(path)-1):
+            pygame.draw.line(screen,green,I.nodes[path[p]]['point'],I.nodes[path[p+1]]['point'],3)
+        path = shortest_path(G, source=0, target=len(G.nodes)-1)
+        for p in range(len(path)-1):
+            pygame.draw.line(screen,green,G.nodes[path[p]]['point'],G.nodes[path[p+1]]['point'],3)
+    else:
+        path = shortest_path(I, source=0, target=len(I.nodes)-1)
+        for p in range(len(path)-1):
+            pygame.draw.line(screen,green,I.nodes[path[p]]['point'],I.nodes[path[p+1]]['point'],3)
 
     while restart == False:
         time.sleep(0.02)
