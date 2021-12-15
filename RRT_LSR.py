@@ -16,7 +16,7 @@ from rppl_globals import *
 show_rrt_progress = True
 bidirectional = True
 length = 10
-numobst = 4  #number of obstacles
+numobst = 6  #number of obstacles
 
 links = [1000/length for i in range(length)]
 base = [xmax/2,ymax/2]
@@ -71,26 +71,31 @@ def find_closest_node(rc,nodes):
 
 def step_to_config(t,q):
     stepping = True
-    while stepping:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                quit()
-        if show_rrt_progress:
-            screen.fill(black)
-            draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
-            draw_discs(obstacles,screen)
-            if bidirectional:
-                draw_arm(transform_robot(links, base, G.nodes[len(G.nodes)-1]['config']),screen,red)
-            pygame.display.update()
-        closest = find_closest_node(q,t.nodes)
-        t.add_node(len(t.nodes),config=add_next_node(q,closest,t))
-        if safe_segments(transform_robot(links, base, t.nodes[len(t.nodes)-1]['config']),obstacles):
-            t.add_edge(len(t.nodes)-1,closest)
-            if config_distance(t.nodes[len(t.nodes)-1]['config'],q) <= stepsize:
+    closest = find_closest_node(q,t.nodes)
+    t.add_node(len(t.nodes),config=add_next_node(q,closest,t))
+    if safe_segments(transform_robot(links, base, t.nodes[len(t.nodes)-1]['config']),obstacles):
+        t.add_edge(len(t.nodes)-1,closest)
+        while stepping:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    quit()
+            if show_rrt_progress:
+                screen.fill(black)
+                draw_arm(transform_robot(links, base, I.nodes[len(I.nodes)-1]['config']),screen,white)
+                draw_discs(obstacles,screen)
+                if bidirectional:
+                    draw_arm(transform_robot(links, base, G.nodes[len(G.nodes)-1]['config']),screen,red)
+                pygame.display.update()
+            t.add_node(len(t.nodes),config=add_next_node(q,len(t.nodes)-1,t))
+            if safe_segments(transform_robot(links, base, t.nodes[len(t.nodes)-1]['config']),obstacles):
+                t.add_edge(len(t.nodes)-1,len(t.nodes)-2)
+                if config_distance(t.nodes[len(t.nodes)-1]['config'],q) <= stepsize:
+                    stepping = False
+            else:
+                t.remove_node(len(t.nodes)-1)
                 stepping = False
-        else:
-            t.remove_node(len(t.nodes)-1)
-            stepping = False
+    else:
+        t.remove_node(len(t.nodes)-1)
 
 while Open:
     I = nx.Graph()
