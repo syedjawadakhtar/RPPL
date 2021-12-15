@@ -70,25 +70,32 @@ while Open:
             rp = goal
         j += 1
         pygame.display.set_caption('RRT, Iteration: ' +str(i))
-        while stepping == True:
-            closest = find_closest_node(rp,G.nodes)
-            G.add_node(len(G.nodes),point=add_next_node(rp,closest,G))
-            if not point_inside_discs(G.nodes[len(G.nodes)-1]['point'],obstacles):
-                G.add_edge(len(G.nodes)-1,closest)
-                pygame.draw.line(screen,white,G.nodes[len(G.nodes)-1]['point'],G.nodes[closest]['point'],2)
-                if dist2(rp, G.nodes[len(G.nodes)-1]['point']) <= stepsize:
+        closest = find_closest_node(rp,G.nodes)
+        G.add_node(len(G.nodes),point=add_next_node(rp,closest,G))
+        if not point_inside_discs(G.nodes[len(G.nodes)-1]['point'],obstacles):
+            G.add_edge(len(G.nodes)-1,closest)
+            pygame.draw.line(screen,white,G.nodes[len(G.nodes)-1]['point'],G.nodes[closest]['point'],2)
+            while stepping == True:
+                G.add_node(len(G.nodes),point=add_next_node(rp,len(G.nodes)-1,G))
+                if not point_inside_discs(G.nodes[len(G.nodes)-1]['point'],obstacles):
+                    G.add_edge(len(G.nodes)-1,len(G.nodes)-2)
+                    pygame.draw.line(screen,white,G.nodes[len(G.nodes)-1]['point'],G.nodes[closest]['point'],2)
+                    if dist2(rp, G.nodes[len(G.nodes)-1]['point']) <= stepsize:
+                        stepping = False
+                else:
+                    G.remove_node(len(G.nodes)-1)
                     stepping = False
-            else:
-                G.remove_node(len(G.nodes)-1)
-                stepping = False
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                quit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                stepping = False
-                restart = True
-                G.add_node(len(G.nodes),point=goal)
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    quit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    stepping = False
+                    restart = True
+                    G.add_node(len(G.nodes),point=goal)
+        else:
+            G.remove_node(len(G.nodes)-1)
         pygame.display.update()
+
         
     if not restart:
         path = shortest_path(G, source=0, target=len(G.nodes)-1)

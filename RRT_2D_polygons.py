@@ -32,25 +32,33 @@ def add_next_node(rp,closest,g):
 
 def step_to_config(t,q):
     stepping = True
-    while stepping:
-        for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    quit()
-        closest = find_closest_node(q, t.nodes)
-        t.add_node(len(t.nodes),point=add_next_node(q,closest,t))
-        if not point_in_triangles(t.nodes[len(t.nodes)-1]['point'],tlist):
-            t.add_edge(len(t.nodes)-1,closest)
-            if t == I:
-                pygame.draw.line(screen,white,t.nodes[closest]['point'],t.nodes[len(t.nodes)-1]['point'],2)
-            else:
-                pygame.draw.line(screen,red,t.nodes[closest]['point'],t.nodes[len(t.nodes)-1]['point'],2)
-            if dist2(t.nodes[len(t.nodes)-1]['point'],q) <= stepsize:
-                stepping = False
+    closest = find_closest_node(q, t.nodes)
+    t.add_node(len(t.nodes),point=add_next_node(q,closest,t))
+    if not point_in_triangles(t.nodes[len(t.nodes)-1]['point'],tlist):
+        t.add_edge(len(t.nodes)-1,closest)
+        if t == I:
+            pygame.draw.line(screen,white,t.nodes[closest]['point'],t.nodes[len(t.nodes)-1]['point'],2)
         else:
-            t.remove_node(len(t.nodes)-1)
-            pygame.display.update()
-            stepping = False
-        
+            pygame.draw.line(screen,red,t.nodes[closest]['point'],t.nodes[len(t.nodes)-1]['point'],2)
+        while stepping:
+            for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                        quit()
+            t.add_node(len(t.nodes),point=add_next_node(q,len(t.nodes)-1,t))
+            if not point_in_triangles(t.nodes[len(t.nodes)-1]['point'],tlist):
+                t.add_edge(len(t.nodes)-1,len(t.nodes)-2)
+                if t == I:
+                    pygame.draw.line(screen,white,t.nodes[len(t.nodes)-2]['point'],t.nodes[len(t.nodes)-1]['point'],2)
+                else:
+                    pygame.draw.line(screen,red,t.nodes[len(t.nodes)-2]['point'],t.nodes[len(t.nodes)-1]['point'],2)
+                if dist2(t.nodes[len(t.nodes)-1]['point'],q) <= stepsize:
+                    stepping = False
+            else:
+                t.remove_node(len(t.nodes)-1)
+                stepping = False
+    else:
+        t.remove_node(len(t.nodes)-1)
+    pygame.display.update()
 
 def find_closest_node(mpos,nodes):
     a = [dist2(mpos, nodes[0]['point']),0]
