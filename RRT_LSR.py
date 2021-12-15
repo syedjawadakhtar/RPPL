@@ -15,15 +15,15 @@ from rppl_globals import *
 
 show_rrt_progress = True
 bidirectional = True
-print_status = True
-length = 10
-numobst = 6  #number of obstacles
+print_status = False
+numlinks = 10 # number of links
+numobst = 6  # number of obstacles
 
-links = [1000/length for i in range(length)]
+links = [1000/numlinks for i in range(numlinks)]
 base = [xmax/2,ymax/2]
-config = [2*pi-2*pi/length for i in range(length)]
-stepsize = 0.1 / length #radians per link
-goal = [2*pi/length for i in range(length)]
+config = [2*pi-2*pi/numlinks for i in range(numlinks)]
+stepsize = 1.0 / numlinks # radians per link
+goal = [2*pi/numlinks for i in range(numlinks)]
 bias = 2
 
 Open = True
@@ -47,18 +47,18 @@ def config_distance(q, r):
         d += sqr(min(abs(q[i] - r[i]), 2.0 * pi - abs(q[i] - r[i])))
     return sqrt(d)
 
-def add_next_node(q,closest,t):
+def calc_new_config(q,closest,t):
     newconfig = []
     c = t.nodes[closest]['config']
     d = config_distance(q,c)
-    #if d == 0:
-    #    d = 1.0E-20
     diff = stepsize / d
     for i in range(len(q)):
-        if abs(q[i] - c[i]) < pi:
-            newconfig.append(fix_angle(c[i] + (q[i] - c[i]) * diff))
+        s = abs(q[i] - c[i])
+        di = min(s, 2.0 * pi - s)
+        if (q[i] > c[i] and s < pi) or (q[i] < c[i] and s > pi):
+            newconfig.append(fix_angle(c[i] + di * diff))
         else:
-            newconfig.append(fix_angle(c[i] - (q[i] - c[i]) * diff))
+            newconfig.append(fix_angle(c[i] - di * diff))
     return newconfig
 
 def find_closest_node(rc,nodes):
@@ -73,7 +73,7 @@ def find_closest_node(rc,nodes):
 def step_to_config(t,q):
     stepping = True
     closest = find_closest_node(q,t.nodes)
-    t.add_node(len(t.nodes),config=add_next_node(q,closest,t))
+    t.add_node(len(t.nodes),config=calc_new_config(q,closest,t))
     if safe_segments(transform_robot(links, base, t.nodes[len(t.nodes)-1]['config']),obstacles):
         t.add_edge(len(t.nodes)-1,closest)
         while stepping:
@@ -87,7 +87,7 @@ def step_to_config(t,q):
                 if bidirectional:
                     draw_arm(transform_robot(links, base, G.nodes[len(G.nodes)-1]['config']),screen,red)
                 pygame.display.update()
-            t.add_node(len(t.nodes),config=add_next_node(q,len(t.nodes)-1,t))
+            t.add_node(len(t.nodes),config=calc_new_config(q,len(t.nodes)-1,t))
             if safe_segments(transform_robot(links, base, t.nodes[len(t.nodes)-1]['config']),obstacles):
                 t.add_edge(len(t.nodes)-1,len(t.nodes)-2)
                 if config_distance(t.nodes[len(t.nodes)-1]['config'],q) <= stepsize:
@@ -124,14 +124,15 @@ while Open:
     if bidirectional:
         if print_status: print('check for straight line')
         step_to_config(I,goal) # Check for straight line
+        
         while config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
-            rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
+            rc = [random.uniform(0.0, 2 * pi) for i in range(numlinks)]
             if print_status: print('connect initial tree to random point')
             step_to_config(I,rc)
             if print_status: print('connect goal tree to new initial tree vertex')
             step_to_config(G,I.nodes[len(I.nodes)-1]['config'])
             if config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
-                rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
+                rc = [random.uniform(0.0, 2 * pi) for i in range(numlinks)]
                 if print_status: print('connect goal tree to random point')
                 step_to_config(G,rc)
                 if print_status: print('connect initial tree to new goal vertex')
@@ -142,7 +143,7 @@ while Open:
             if i % bias == 0:
                 rc = goal
             else:
-                rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
+                rc = [random.uniform(0.0, 2 * pi) for i in range(numlinks)]
             step_to_config(I,rc)
             i += 1
     
