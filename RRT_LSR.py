@@ -15,6 +15,7 @@ from rppl_globals import *
 
 show_rrt_progress = True
 bidirectional = True
+print_status = True
 length = 10
 numobst = 6  #number of obstacles
 
@@ -116,24 +117,24 @@ while Open:
     time.sleep(0.5)
     pstat = 0
     restart = False
-    pygame.display.set_caption('RRT Line Segment Robot')
+    pygame.display.set_caption('RRT Line Segment Robot - Controls: [R] = Run again, [ESC] = Quit')
     t = time.time()
     i = 0
 
     if bidirectional:
-        print('check for straight line')
+        if print_status: print('check for straight line')
         step_to_config(I,goal) # Check for straight line
         while config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
             rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
-            print('connect initial tree to random point')
+            if print_status: print('connect initial tree to random point')
             step_to_config(I,rc)
-            print('connect goal tree to new initial tree vertex')
+            if print_status: print('connect goal tree to new initial tree vertex')
             step_to_config(G,I.nodes[len(I.nodes)-1]['config'])
             if config_distance(I.nodes[len(I.nodes)-1]['config'],G.nodes[len(G.nodes)-1]['config']) > stepsize:
                 rc = [random.uniform(0.0, 2 * pi) for i in range(length)]
-                print('connect goal tree to random point')
+                if print_status: print('connect goal tree to random point')
                 step_to_config(G,rc)
-                print('connect initial tree to new goal vertex')
+                if print_status: print('connect initial tree to new goal vertex')
                 step_to_config(I,G.nodes[len(G.nodes)-1]['config'])
 
     else:
@@ -189,4 +190,5 @@ while Open:
             draw_discs(obstacles,screen)
             draw_arm(transform_robot(links, base, G.nodes[s]['config']),screen,white)
             pygame.display.update()
-        time.sleep(1)
+        if not restart:
+            time.sleep(1)
