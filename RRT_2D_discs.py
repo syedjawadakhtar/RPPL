@@ -29,7 +29,7 @@ cycle = 6
 def add_next_node(rp,closest,g):
     d = dist2(rp,g.nodes[closest]['point'])
     if d == 0:
-        d = 1.0E20
+        d = 1.0E-20
     diff = stepsize / d
     newpoint = ((rp[0] - g.nodes[closest]['point'][0]) * diff + g.nodes[closest]['point'][0],(rp[1] - g.nodes[closest]['point'][1]) * diff + g.nodes[closest]['point'][1])
     return newpoint
