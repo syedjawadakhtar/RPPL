@@ -19,7 +19,7 @@ exnum = 0 # example number
 xmax = 800 # force a square environment
 
 screen = pygame.display.set_mode([xmax,ymax])
-use_dijkstra = False
+use_dijkstra = True
 pygame.display.set_caption('Grid Planner')
 
 # value iteration constants
@@ -73,6 +73,7 @@ def valit_path(graph, init, goal):
                 set_node_attributes(graph, {m:best_cost}, 'value')
                 set_node_attributes(graph, {m:best_n}, 'next')
         i += 1
+    print("Stages: ", + i)
     path = []
     if graph.nodes[init]['value'] < failure_cost:
         path.append(init)
@@ -136,10 +137,12 @@ def Draw():
             t = time.time()
             path = nx.dijkstra_path(G,p1index,p2index)
             print('dijkstra:    time elapsed:     ' + str(time.time() - t) + ' seconds')
+            print("Path length: "+ str(len(path)))
         else:
             t = time.time()
             path = valit_path(G,p1index,p2index)
             print('value iteration: time elapsed: ' + str(time.time() - t) + ' seconds')
+            print("Path length: "+ str(len(path)))
         for l in range(len(path)):
             if l > 0:
                 pygame.draw.line(screen,green,G.nodes[path[l]]['point'],G.nodes[path[l-1]]['point'],5)
