@@ -21,3 +21,7 @@ Main files:
 - RRT_2D_polygons.py:  Similar to RRT_2D_discs.py, but instead works for obstacles that are simple polygons. To create an example problem, use draw_polygons.py.
 
 - RRT_LSR.py:  Solves planning problems using goal bias or bidirectional RRT for a 2D kinematic chain of line segments with a fixed base and arbitrarily many links. The base is fixed.
+
+
+#### Edits to the library
+This library was asked to be edited for the course [Fundementals of Sensing, Tracking and Autonomy - 2](https://opas.peppi.oulu.fi/en/course/IC00AK50/35227) at the University of Oulu.
