@@ -128,6 +128,7 @@ while Open:
 
     print('planning time: ' + str(time.time() - t) + ' seconds')
     pygame.display.set_caption('RRT Plan, Total nodes: ' + str(len(I.nodes)+len(G.nodes)))
+    print("Total Nodes: "+str(len(I.nodes)+len(G.nodes)))
     if bidirectional:
         path = shortest_path(I, source=0, target=len(I.nodes)-1)
         for p in range(len(path)-1):
@@ -148,8 +149,10 @@ while Open:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 if bidirectional:
                     bidirectional = False
+                    print("Bidirection = False")
                 else:
                     bidirectional = True
+                    print("Bidirection = True")
                 restart = True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 quit()
